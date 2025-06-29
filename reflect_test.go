@@ -340,6 +340,13 @@ type PatternEqualsTest struct {
 	WithEqualsAndCommas string `jsonschema:"pattern=foo\\,=bar"`
 }
 
+type CustomNullable struct {
+	FirstName  string  `json:"first_name"`
+	LastName   string  `json:"last_name"`
+	Age        uint    `json:"age"`
+	MiddleName *string `json:"middle_name" jsonschema:"nullable"`
+}
+
 func TestReflector(t *testing.T) {
 	r := new(Reflector)
 	s := "http://example.com/schema"
@@ -473,6 +480,7 @@ func TestSchemaGeneration(t *testing.T) {
 		{SchemaExtendTest{}, &Reflector{}, "fixtures/custom_type_extend.json"},
 		{Expression{}, &Reflector{}, "fixtures/schema_with_expression.json"},
 		{PatternEqualsTest{}, &Reflector{}, "fixtures/equals_in_pattern.json"},
+		{CustomNullable{}, &Reflector{CustomNullable: true, DoNotReference: true}, "fixtures/custom_nullable.json"},
 	}
 
 	for _, tt := range tests {

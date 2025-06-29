@@ -115,6 +115,9 @@ type Reflector struct {
 	// root as opposed to a definition with a reference.
 	ExpandedStruct bool
 
+	// CustomNullable when true will add "null" value to type array for nullable fields
+	CustomNullable bool
+
 	// FieldNameTag will change the tag used to get field names. json tags are used by default.
 	FieldNameTag string
 
@@ -530,13 +533,17 @@ func (r *Reflector) reflectStructFields(st *Schema, definitions Definitions, t r
 		}
 
 		if nullable {
-			property = &Schema{
-				OneOf: []*Schema{
-					property,
-					{
-						Type: "null",
+			if r.CustomNullable {
+				property.Type = property.Type + typeSeparator + "null"
+			} else {
+				property = &Schema{
+					OneOf: []*Schema{
+						property,
+						{
+							Type: "null",
+						},
 					},
-				},
+				}
 			}
 		}
 
@@ -640,7 +647,7 @@ func (t *Schema) genericKeywords(tags []string, parent *Schema, propertyName str
 			case "description":
 				t.Description = val
 			case "type":
-				t.Type = val
+				t.Type = Type(val)
 			case "anchor":
 				t.Anchor = val
 			case "oneof_required":
@@ -696,7 +703,7 @@ func (t *Schema) genericKeywords(tags []string, parent *Schema, propertyName str
 				types := strings.Split(nameValue[1], ";")
 				for _, ty := range types {
 					t.OneOf = append(t.OneOf, &Schema{
-						Type: ty,
+						Type: Type(ty),
 					})
 				}
 			case "anyof_ref":
@@ -722,7 +729,7 @@ func (t *Schema) genericKeywords(tags []string, parent *Schema, propertyName str
 				types := strings.Split(nameValue[1], ";")
 				for _, ty := range types {
 					t.AnyOf = append(t.AnyOf, &Schema{
-						Type: ty,
+						Type: Type(ty),
 					})
 				}
 			default:
