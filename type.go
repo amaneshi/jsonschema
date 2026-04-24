@@ -8,8 +8,10 @@ import (
 
 const typeSeparator = ";"
 
+// Type is a JSON schema type, which can be a string or a list of strings delimited by ";".
 type Type string
 
+// MarshalJSON is used to serialize a Type to JSON.
 func (t Type) MarshalJSON() ([]byte, error) {
 	str := string(t)
 	if strings.Contains(str, typeSeparator) {
@@ -27,6 +29,7 @@ func (t Type) MarshalJSON() ([]byte, error) {
 	return json.Marshal(str)
 }
 
+// UnmarshalJSON unmarshals a JSON string or array of strings into a Type.
 func (t *Type) UnmarshalJSON(data []byte) error {
 	// Try to unmarshal as string first
 	var str string

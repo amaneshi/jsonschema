@@ -724,7 +724,7 @@ func TestJSONStringTag(t *testing.T) {
 		target   any
 		typeName string
 		property string
-		expected string
+		expected Type
 	}{
 		{"int with ,string", &Ints{}, "Ints", "a", "string"},
 		{"int plain", &Ints{}, "Ints", "b", "integer"},
@@ -762,7 +762,7 @@ func TestJSONStringTagUsesStringKeywords(t *testing.T) {
 
 	pa, found := props.Get("a")
 	require.True(t, found)
-	require.Equal(t, "string", pa.Type)
+	require.Equal(t, Type("string"), pa.Type)
 	require.NotNil(t, pa.MinLength)
 	require.NotNil(t, pa.MaxLength)
 	require.EqualValues(t, 2, *pa.MinLength)
@@ -788,7 +788,7 @@ func TestJSONStringTagRequiresExactOptionMatch(t *testing.T) {
 
 	pa, found := props.Get("a")
 	require.True(t, found)
-	require.Equal(t, "integer", pa.Type)
+	require.Equal(t, Type("integer"), pa.Type)
 	require.Nil(t, pa.MinLength)
 	require.Equal(t, json.Number("3"), pa.Minimum)
 }
